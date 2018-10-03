@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import yaml
-import json
 import re
 
 def getEnumMatcher(enumYaml):
@@ -46,6 +45,5 @@ def generateKarate(yamlFile):
             continue 
 
         karate[prop] = getKarateType(properties[prop])
-
-    karateJson = json.dumps(karate, indent=4) 
-    print(karate)
+    
+    return karate
