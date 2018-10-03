@@ -28,15 +28,14 @@ def getKarateType(prop):
     if nullable:
         karateType = '#' + karateType
 
+    if oasType == 'object':
+        childProperties = prop.get('properties', False)
+        if childProperties:
+            karateType = processProperties(childProperties)
+
     return karateType
 
-def generateKarate(yamlFile):
-    docs = yaml.load(yamlFile)
-    try:
-        properties = docs['properties']
-    except:
-        print("No properties found in file")
-        return
+def processProperties(properties):
     karate = {}
     for prop in properties.keys():
         # WriteOnly properties are not part of the response
@@ -47,3 +46,12 @@ def generateKarate(yamlFile):
         karate[prop] = getKarateType(properties[prop])
     
     return karate
+
+def generateKarate(yamlFile):
+    docs = yaml.load(yamlFile)
+    try:
+        properties = docs['properties']
+    except:
+        print("No properties found in file")
+        return
+    return processProperties(properties)
