@@ -16,6 +16,9 @@ def create_karate_json_of_file(yamlFilePath):
     with open(yamlFilePath, 'rb') as f:
         print("Reading " + yamlFilePath)
         karate = generateKarate(f)
+    if karate is None:
+        print("Not writing output")
+        return
 
     inFileName = os.path.basename(yamlFilePath)
     outFileName = os.path.splitext(inFileName)[0] + '.json'
@@ -23,9 +26,8 @@ def create_karate_json_of_file(yamlFilePath):
     with open(outFilePath, 'w') as fp:
         json.dump(karate, fp, indent=4)
         print("Wrote to: " + outFilePath)
-        print(json.dumps(karate, indent=4))
+        #print(json.dumps(karate, indent=4))
         
-
 if os.path.isfile(file_or_directory_path):
     create_karate_json_of_file(file_or_directory_path)
 
