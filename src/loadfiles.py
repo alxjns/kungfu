@@ -2,11 +2,17 @@
 
 import os
 import json
+from argparse import ArgumentParser
 from generateKarate import generateKarate
 
-file_or_directory_path = '/Users/user/schemas/'
+parser = ArgumentParser('Process spec files into Karate JSON')
+parser.add_argument('input', help='Path of file or folder for processing')
+parser.add_argument('-o', '--out', default='kungfu-output', help='Folder where output will be written')
+args = parser.parse_args()
 
-outFolderName = "out"
+file_or_directory_path = args.input
+outFolderName = args.out
+
 try:
     os.mkdir(outFolderName)
 except FileExistsError:
