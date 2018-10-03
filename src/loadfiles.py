@@ -10,6 +10,7 @@ def do_something(fileobj):
 
 if os.path.isfile(file_or_directory_path):
     with open(file_or_directory_path, 'rb') as f:
+        print(file_or_directory_path)
         do_something(f)
 
 if os.path.isdir(file_or_directory_path):

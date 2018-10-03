@@ -2,15 +2,28 @@
 
 import yaml
 import json
+import re
+
+def getEnumMatcher(enumYaml):
+    matcher = "#regex("
+    for value in enumYaml:
+        escaped = re.sub(r"-", r"\\-", value)
+        matcher += (escaped + "|")
+    matcher = matcher[:-1] + ")"
+    return matcher
 
 def getKarateType(prop):
-    oasType = prop.get('type', 'other')
+    oasType = prop.get('type', None)
     karateType = '#notnull'
 
     if oasType in ('string', 'number', 'boolean', 'array', 'object'):
         karateType = '#' + oasType
     elif oasType == 'integer':
         karateType = '#number'
+
+    enum = prop.get('enum', None)
+    if oasType == 'string' and enum is not None:
+        karateType = getEnumMatcher(enum)
 
     nullable = prop.get('nullable', False)
     if nullable:
