@@ -29,9 +29,9 @@ def getKarateType(prop):
         karateType = '#' + karateType
 
     if oasType == 'object':
-        properties = prop.get('properties', False)
-        if properties:
-            karateType = processProperties(properties)
+        childProperties = prop.get('properties', False)
+        if childProperties:
+            karateType = processProperties(childProperties)
 
     return karateType
 
