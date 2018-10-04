@@ -38,10 +38,10 @@ def getKarateType(prop):
 def processProperties(properties):
     karate = {}
     for prop in properties.keys():
-        # WriteOnly properties are not part of the response
+    
         writeOnly = properties[prop].get('writeOnly', False)
         if writeOnly:
-            continue 
+            continue # WriteOnly properties are not part of the response
 
         karate[prop] = getKarateType(properties[prop])
     
@@ -49,9 +49,18 @@ def processProperties(properties):
 
 def generateKarate(yamlFile):
     docs = yaml.load(yamlFile)
-    try:
-        properties = docs['properties']
-    except:
-        print("No properties found in file")
-        return
-    return processProperties(properties)
+    
+    properties = docs.get('properties', False)
+    if properties:
+        return processProperties(properties)
+
+    allOf = docs.get('allOf', False)
+    if allOf:
+        for subschema in allOf:
+            properties = subschema.get('properties', False)
+            if properties:
+                return processProperties(properties)
+
+    print("No properties found in file")
+    return
+    
