@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import os
-import json
 from argparse import ArgumentParser
+import json
+import os
+
 from generateKarate import generateKarate
 
 parser = ArgumentParser('Process spec files into Karate JSON')
