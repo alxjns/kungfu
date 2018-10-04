@@ -1,7 +1,9 @@
 #!/usr/bin/python
 
-import yaml
+import os.path as os_path
 import re
+
+import yaml
 
 def getEnumMatcher(enumYaml):
     matcher = "#regex("
@@ -35,16 +37,34 @@ def getKarateType(prop):
 
     return karateType
 
-def processProperties(properties):
+def processProperties(properties, rootFilePath = None):
     karate = {}
     for prop in properties.keys():
         # WriteOnly properties are not part of the response
         writeOnly = properties[prop].get('writeOnly', False)
         if writeOnly:
-            continue 
+            continue
 
-        karate[prop] = getKarateType(properties[prop])
-    
+        refFilePath = properties[prop].get('$ref')
+
+        if refFilePath:
+            rootFileDir = os_path.dirname(rootFilePath)
+            absRefFilePath = os_path.abspath(os_path.join(rootFileDir, refFilePath))
+
+            if os_path.isfile(absRefFilePath):
+                with open(absRefFilePath, 'r') as fp:
+                    refDoc = yaml.load(fp)
+                    if 'oneOf' in refDoc:
+                        karateTypes = []
+                        for element in refDoc['oneOf']:
+                            karateTypes.append(getKarateType(element))
+
+                        karate[prop] = '|'.join(karateTypes)
+                    else:
+                        karate[prop] = getKarateType(refDoc)
+        else:
+            karate[prop] = getKarateType(properties[prop])
+
     return karate
 
 def generateKarate(yamlFile):
@@ -54,4 +74,4 @@ def generateKarate(yamlFile):
     except:
         print("No properties found in file")
         return
-    return processProperties(properties)
+    return processProperties(properties, yamlFile.name)
