@@ -3,7 +3,7 @@
 import os
 import json
 from argparse import ArgumentParser
-from generateKarate import generateKarateFromYaml
+from generateKarate import generateKarateFromYaml, generateKarateFromJson
 
 parser = ArgumentParser('Process a compiled spec file into Karate JSON')
 parser.add_argument('input', help='Path of file or folder for processing')
@@ -34,13 +34,24 @@ def create_karate_json_of_yaml(yamlFilePath):
         print("Wrote to: " + outFilePath)
         #print(json.dumps(karate, indent=4))
 
-def parse_full_json_spec(jsonFilePath):
+def parse_full_json_spec(inputFilePath):
     print("Processing JSON file")
+    with open(inputFilePath, 'rb') as f:
+        print("Reading " + inputFilePath)
+        karateSchemas = generateKarateFromJson(f)
+    if karateSchemas is None:
+        print("Not writing output")
+        return
+
+    for schema in karateSchemas:
+        outFileName = schema + '.json'
+        outFilePath = os.path.join(outFolderName, outFileName)
+        with open(outFilePath, 'w') as fp:
+            json.dump(karateSchemas[schema], fp, indent=4)
+            print("Wrote to: " + outFilePath)
+            #print(json.dumps(karateSchemas[schema], indent=4))
         
 if os.path.isfile(file_or_directory_path):
-    #fullpath = os.path.join(file_or_directory_path, path)
-    print(file_or_directory_path)
-    print(os.path.splitext(file_or_directory_path))
     if os.path.splitext(file_or_directory_path)[1] == '.json':
                 parse_full_json_spec(file_or_directory_path)
     else:

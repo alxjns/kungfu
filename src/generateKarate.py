@@ -1,7 +1,11 @@
 #!/usr/bin/python
 
 import yaml
+import json
 import re
+import pprint
+
+pp = pprint.PrettyPrinter(depth=3)
 
 def getEnumMatcher(enumYaml):
     matcher = "#regex("
@@ -47,6 +51,20 @@ def processProperties(properties):
     
     return karate
 
+def processSchemas(schemas):
+    #pp.pprint(schemas)
+    karate_schemas = {}
+    for schema in schemas:
+        print(schema)
+        try:
+            properties = schemas[schema]['properties']
+            print('Got properties')
+        except:
+            print('No properties found in schema')
+            continue
+        karate_schemas[schema] = processProperties(properties)
+    return karate_schemas
+
 def generateKarateFromYaml(yamlFile):
     docs = yaml.load(yamlFile)
     try:
@@ -55,3 +73,13 @@ def generateKarateFromYaml(yamlFile):
         print("No properties found in file")
         return
     return processProperties(properties)
+
+def generateKarateFromJson(inputFile):
+    docs = json.load(inputFile)
+    try:
+        schemas = docs['components']['schemas']
+        print("got schemas")
+    except:
+        print("No schemas found in file")
+        return
+    return processSchemas(schemas)
