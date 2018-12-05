@@ -3,9 +3,9 @@
 import os
 import json
 from argparse import ArgumentParser
-from generateKarate import generateKarate
+from generateKarate import generateKarateFromYaml
 
-parser = ArgumentParser('Process spec files into Karate JSON')
+parser = ArgumentParser('Process a compiled spec file into Karate JSON')
 parser.add_argument('input', help='Path of file or folder for processing')
 parser.add_argument('-o', '--out', default='kungfu-output', help='Folder where output will be written')
 args = parser.parse_args()
@@ -18,10 +18,10 @@ try:
 except FileExistsError:
     pass
 
-def create_karate_json_of_file(yamlFilePath):
+def create_karate_json_of_yaml(yamlFilePath):
     with open(yamlFilePath, 'rb') as f:
         print("Reading " + yamlFilePath)
-        karate = generateKarate(f)
+        karate = generateKarateFromYaml(f)
     if karate is None:
         print("Not writing output")
         return
@@ -33,12 +33,24 @@ def create_karate_json_of_file(yamlFilePath):
         json.dump(karate, fp, indent=4)
         print("Wrote to: " + outFilePath)
         #print(json.dumps(karate, indent=4))
+
+def parse_full_json_spec(jsonFilePath):
+    print("Processing JSON file")
         
 if os.path.isfile(file_or_directory_path):
-    create_karate_json_of_file(file_or_directory_path)
+    #fullpath = os.path.join(file_or_directory_path, path)
+    print(file_or_directory_path)
+    print(os.path.splitext(file_or_directory_path))
+    if os.path.splitext(file_or_directory_path)[1] == '.json':
+                parse_full_json_spec(file_or_directory_path)
+    else:
+        create_karate_json_of_yaml(file_or_directory_path)
 
 if os.path.isdir(file_or_directory_path):
     for path in os.listdir(file_or_directory_path):
         fullpath = os.path.join(file_or_directory_path, path)
         if os.path.isfile(fullpath):
-            create_karate_json_of_file(fullpath)
+            if os.path.splitext(fullpath)[1] == '.json':
+                parse_full_json_spec(fullpath)
+            else:
+                create_karate_json_of_yaml(fullpath)

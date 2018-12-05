@@ -47,7 +47,7 @@ def processProperties(properties):
     
     return karate
 
-def generateKarate(yamlFile):
+def generateKarateFromYaml(yamlFile):
     docs = yaml.load(yamlFile)
     try:
         properties = docs['properties']
