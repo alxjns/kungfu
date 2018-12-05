@@ -58,11 +58,26 @@ def processSchemas(schemas):
         print(schema)
         try:
             properties = schemas[schema]['properties']
+            #print(pp.pprint(schemas[schema]['properties']))
+            karate_schemas[schema] = processProperties(properties)
             print('Got properties')
         except:
-            print('No properties found in schema')
-            continue
-        karate_schemas[schema] = processProperties(properties)
+            try:
+                properties = schemas[schema]['allOf']
+                #print(pp.pprint(schemas[schema]['allOf']['properties']))
+                #karate_schemas[schema] = processProperties(properties)
+                print('Got allOf found in schema')
+                continue
+            except:
+                try:
+                    properties = schemas[schema]['description']
+                    print('Got description found in schema')
+                    continue
+                except:
+                    print(pp.pprint(schemas[schema]))
+                    print(schemas[schema].keys())
+                    print('No properties or allOf found in schema')
+
     return karate_schemas
 
 def generateKarateFromYaml(yamlFile):
