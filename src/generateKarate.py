@@ -4,6 +4,7 @@ import yaml
 import json
 import re
 import pprint
+from refRetriever import RefRetriever
 
 pp = pprint.PrettyPrinter(depth=3)
 
@@ -15,9 +16,30 @@ def getEnumMatcher(enumYaml):
     matcher = matcher[:-1] + ")"
     return matcher
 
+def processRefProperty(prop):
+    """
+    Given an OpenApi property object with a $ref, returns the content the $ref points to.
+    Except, if the $ref is in the blacklist `links_not_to_follow`, returns the original property. 
+    """
+    
+    links_not_to_follow = ["#/components/schemas/Links"]
+    if prop['$ref'] in links_not_to_follow:
+        return prop
+    
+    refhelper = RefRetriever(prop['$ref'], docs)
+    return refhelper.refTarget
+    
+
 def getKarateType(prop):
-    oasType = prop.get('type', None)
+    """
+    Given an OpenApi property object, returns a Karate fuzzy matcher
+    """
     karateType = '#notnull'
+
+    if (not 'type' in prop) and ('$ref' in prop) and docs:
+        prop = processRefProperty(prop)
+        
+    oasType = prop.get('type', None)
 
     if oasType in ('string', 'number', 'boolean', 'array', 'object'):
         karateType = '#' + oasType
@@ -95,6 +117,7 @@ def generateKarateFromYaml(yamlFile):
     return processSchema(schema)
 
 def generateKarateFromJson(inputFile):
+    global docs
     docs = json.load(inputFile)
     try:
         schemas = docs['components']['schemas']
