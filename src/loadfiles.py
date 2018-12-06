@@ -18,23 +18,38 @@ try:
 except FileExistsError:
     pass
 
+def write_file(outFileName, content):
+    """
+    Writes Karate content to a file
+    """
+    if content is None:
+        print("No content. NOT writing", outFileName)
+        return
+    if 'Kungfu error' in content:
+        print("A valid matcher was NOT created for", outFileName)
+
+    out_file_path = os.path.join(outFolderName, outFileName)
+    with open(out_file_path, 'w') as fp:
+        json.dump(content, fp, indent=4)
+        print("Wrote to: " + out_file_path)
+        #print(json.dumps(karateSchemas[schema], indent=4))
+
 def create_karate_json_of_yaml(yamlFilePath):
+    """
+    Generates one Karate file from one Yaml OpenApi schema file
+    """
     with open(yamlFilePath, 'rb') as f:
         print("Reading " + yamlFilePath)
         karate = generateKarateFromYaml(f)
-    if karate is None:
-        print("Not writing output")
-        return
 
     inFileName = os.path.basename(yamlFilePath)
     outFileName = os.path.splitext(inFileName)[0] + '.json'
-    outFilePath = os.path.join(outFolderName, outFileName)
-    with open(outFilePath, 'w') as fp:
-        json.dump(karate, fp, indent=4)
-        print("Wrote to: " + outFilePath)
-        #print(json.dumps(karate, indent=4))
+    write_file(outFileName, karate)
 
 def parse_full_json_spec(inputFilePath):
+    """
+    Generates multiple Karate files based on one compiled OpenApi specification
+    """
     print("Processing JSON file")
     with open(inputFilePath, 'rb') as f:
         print("Reading " + inputFilePath)
@@ -44,15 +59,8 @@ def parse_full_json_spec(inputFilePath):
         return
 
     for schema in karateSchemas:
-        matcher = karateSchemas[schema]
-        if (matcher is None) or ('Kungfu error' in matcher):
-            print("A valid matcher was NOT created for", schema)
         outFileName = schema + '.json'
-        outFilePath = os.path.join(outFolderName, outFileName)
-        with open(outFilePath, 'w') as fp:
-            json.dump(matcher, fp, indent=4)
-            print("Wrote to: " + outFilePath)
-            #print(json.dumps(karateSchemas[schema], indent=4))
+        write_file(outFileName, karateSchemas[schema])
         
 if os.path.isfile(file_or_directory_path):
     if os.path.splitext(file_or_directory_path)[1] == '.json':
