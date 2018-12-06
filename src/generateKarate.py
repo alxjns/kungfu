@@ -34,11 +34,16 @@ def getKarateType(prop):
     """
     Given an OpenApi property object, returns a Karate fuzzy matcher
     """
+
     karateType = '#notnull'
+
+    if isinstance(prop, unicode):
+        if prop == 'array':
+            return '#array'
 
     if (not 'type' in prop) and ('$ref' in prop) and docs:
         prop = processRefProperty(prop)
-        
+
     oasType = prop.get('type', None)
 
     if oasType in ('string', 'number', 'boolean', 'array', 'object'):
@@ -83,9 +88,15 @@ def processAllOfInSchema(items):
 def processOneOfInSchema(items):
     """
     This should take the contents of a OneOf and return some valid Karate matcher
-    TODO: make this work
     """
-    return {'Kungfu error': 'schema type: oneOf'}
+    karate = {}
+    for schema in items:
+        if 'properties' in schema:
+            for prop in schema['properties']:
+                karate[prop] = getKarateType(schema['properties'][prop])
+        elif 'type' in schema:
+            karate[schema['type']] = getKarateType(schema['type'])
+    return karate
 
 def processSchema(schema):
     """
