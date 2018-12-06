@@ -44,10 +44,13 @@ def parse_full_json_spec(inputFilePath):
         return
 
     for schema in karateSchemas:
+        matcher = karateSchemas[schema]
+        if (matcher is None) or ('Kungfu error' in matcher):
+            print("A valid matcher was NOT created for", schema)
         outFileName = schema + '.json'
         outFilePath = os.path.join(outFolderName, outFileName)
         with open(outFilePath, 'w') as fp:
-            json.dump(karateSchemas[schema], fp, indent=4)
+            json.dump(matcher, fp, indent=4)
             print("Wrote to: " + outFilePath)
             #print(json.dumps(karateSchemas[schema], indent=4))
         

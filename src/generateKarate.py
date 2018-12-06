@@ -51,28 +51,48 @@ def processProperties(properties):
     
     return karate
 
+def processAllOfInSchema(items):
+    """
+    This should take the contents of a AllOf and return some valid Karate matcher
+    TODO: make this work
+    """
+    return {'Kungfu error': 'schema type: allOf'}
+
+def processOneOfInSchema(items):
+    """
+    This should take the contents of a OneOf and return some valid Karate matcher
+    TODO: make this work
+    """
+    return {'Kungfu error': 'schema type: oneOf'}
+
+def processSchema(schema):
+    """
+    This takes a schema object and returns its best guess of a Karate matcher for the schema
+    """
+    if 'properties' in schema:
+        return processProperties(schema['properties'])
+    elif 'allOf' in schema:
+        return processAllOfInSchema(schema['allOf'])
+    elif 'oneOf' in schema:
+        return processOneOfInSchema(schema['oneOf'])
+    else:
+        print('No properties found in schema')
+        pp.pprint(schema)
+        return None
+
 def processSchemas(schemas):
+    """
+    This takes an object comprised of schemas and returns an object with a Karate matcher for each schema
+    """
     #pp.pprint(schemas)
     karate_schemas = {}
     for schema in schemas:
-        print(schema)
-        try:
-            properties = schemas[schema]['properties']
-            print('Got properties')
-        except:
-            print('No properties found in schema')
-            continue
-        karate_schemas[schema] = processProperties(properties)
+        karate_schemas[schema] = processSchema(schemas[schema])
     return karate_schemas
 
 def generateKarateFromYaml(yamlFile):
-    docs = yaml.load(yamlFile)
-    try:
-        properties = docs['properties']
-    except:
-        print("No properties found in file")
-        return
-    return processProperties(properties)
+    schema = yaml.load(yamlFile)
+    return processSchema(schema)
 
 def generateKarateFromJson(inputFile):
     docs = json.load(inputFile)
