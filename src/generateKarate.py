@@ -101,6 +101,9 @@ def processSchema(schema):
         return processAllOfInSchema(schema['allOf'])
     elif 'oneOf' in schema:
         return processOneOfInSchema(schema['oneOf'])
+    elif '$ref' in schema:
+        ref_schema = processRefProperty(schema)
+        return processSchema(ref_schema)
     else:
         print('No properties found in schema')
         pp.pprint(schema)
