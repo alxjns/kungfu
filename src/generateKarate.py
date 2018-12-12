@@ -76,9 +76,13 @@ def processProperties(properties):
 def processAllOfInSchema(items):
     """
     This should take the contents of a AllOf and return some valid Karate matcher
-    TODO: make this work
     """
-    return {'Kungfu error': 'schema type: allOf'}
+    karate = {}
+    for item in items:
+        item_karate = processSchema(item)
+        if(item_karate):
+            karate = {**karate, **item_karate}
+    return karate
 
 def processOneOfInSchema(items):
     """
@@ -97,6 +101,9 @@ def processSchema(schema):
         return processAllOfInSchema(schema['allOf'])
     elif 'oneOf' in schema:
         return processOneOfInSchema(schema['oneOf'])
+    elif '$ref' in schema:
+        ref_schema = processRefProperty(schema)
+        return processSchema(ref_schema)
     else:
         print('No properties found in schema')
         pp.pprint(schema)
