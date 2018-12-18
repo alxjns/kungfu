@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 
+
 class RefRetriever():
     def __init__(self: object, refString: str, specFile: dict):
         """
@@ -14,8 +15,9 @@ class RefRetriever():
 
     def convertRefStringToKeyList(self):
         """
-        This creates a list of the keys/indices needed to exctract the desired JSON from the specification object.
-        It removes leading # and converts strings to integers where possible.
+        This creates a list of the keys/indices needed to exctract the
+        desired JSON from the specification object. It removes leading
+        # and converts strings to integers where possible.
         """
         pathList = self.refString.split('/')
         pathList.remove('#')
@@ -36,6 +38,7 @@ class RefRetriever():
         for key in pathList:
             jsonSnip = jsonSnip[key]
         return jsonSnip
+
 
 # You can run this file alone if you set `ref` and `inputFilePath` below
 if __name__ == "__main__":
