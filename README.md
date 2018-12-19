@@ -6,7 +6,7 @@ It outputs JSON with [Karate fuzzy matchers](https://github.com/intuit/karate#fu
 For example, an output `CreditCard.json` might look like:
 
     {
-        "type": "#regex(credit\\-card)",
+        "type": "credit-card",
         "nameOnCard": "#string",
         "cardNumber": "#string",
         "cardType": "#regex(amex|discover|mastercard|visa)",
