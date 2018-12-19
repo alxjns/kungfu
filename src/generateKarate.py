@@ -13,7 +13,7 @@ def getEnumMatcher(enumYaml):
     if len(enumYaml) == 1:
         return enumYaml[0]
     for value in enumYaml:
-        escaped = re.sub(r"-", r"\\-", value)
+        escaped = re.sub(r"-", r"\\-", str(value))
         matcher += (escaped + "|")
     matcher = matcher[:-1] + ")"
     return matcher
@@ -57,8 +57,7 @@ def getKarateType(prop):
         karateType = '#number'
 
     enum = prop.get('enum')
-    if openApiType == 'string' and enum:
-
+    if enum:
         karateType = getEnumMatcher(enum)
 
     nullable = prop.get('nullable')
