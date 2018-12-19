@@ -125,10 +125,24 @@ def processAllOfInProperty(items):
 def processAllOfInSchema(items):
     """
     This should take the contents of a AllOf
-    and return some valid Karate matcher
+    and return some valid Karate matcher.
+
+    We're treating allOf as if it's an inheritance thing,
+    though that's not really how it was intended to be used.
+    We want later items in allOf to take precendence,
+    And non-$ref items to take precedence over $ref
     """
-    karate = {}
+
+    sorted_schemas = []
     for item in items:
+        if item.get('$ref'):
+            sorted_schemas.append(item)
+    for item in items:
+        if not item.get('$ref'):
+            sorted_schemas.append(item)
+
+    karate = {}
+    for item in sorted_schemas:
         item_karate = processSchema(item)
         if(item_karate):
             karate = {**karate, **item_karate}
