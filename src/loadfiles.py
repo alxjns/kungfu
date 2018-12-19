@@ -30,7 +30,8 @@ def write_file(outFileName, content):
 
     out_file_path = os.path.join(outFolderName, outFileName)
     with open(out_file_path, 'w') as fp:
-        json.dump(content, fp, indent=4)
+        json.dump(content, fp, indent=2)
+        fp.write("\n")
         print("Wrote to: " + out_file_path)
         #print(json.dumps(karateSchemas[schema], indent=4))
 
@@ -60,6 +61,8 @@ def parse_full_json_spec(inputFilePath):
 
     for schema in karateSchemas:
         outFileName = schema + '.json'
+        lowChar = outFileName[0].lower()
+        outFileName = lowChar + outFileName[1:]
         write_file(outFileName, karateSchemas[schema])
         
 if os.path.isfile(file_or_directory_path):
