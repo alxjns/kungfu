@@ -10,6 +10,8 @@ pp = pprint.PrettyPrinter(depth=3)
 
 def getEnumMatcher(enumYaml):
     matcher = "#regex("
+    if len(enumYaml) == 1:
+        return enumYaml[0]
     for value in enumYaml:
         escaped = re.sub(r"-", r"\\-", value)
         matcher += (escaped + "|")
